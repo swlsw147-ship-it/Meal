@@ -5,84 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UNIST 식단</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
       padding: 16px;
-      font-size: 18px;
-      line-height: 1.5;
-      background: #f7f7f7;
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
       color: #111;
     }
 
-    h1 {
-      font-size: 30px;
-      margin: 0 0 8px 0;
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
     }
 
-    .sub {
-      font-size: 16px;
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      font-size: 17px;
       color: #555;
       margin-bottom: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .top-actions button {
+      flex: 1;
     }
 
     .tab-row {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      margin-bottom: 12px;
       padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+
+    .tab-row::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .tab-row::-webkit-scrollbar-thumb {
+      background: #d0d4dd;
+      border-radius: 999px;
     }
 
     button {
       border: none;
       border-radius: 12px;
-      padding: 10px 14px;
-      background: #e7e7e7;
+      padding: 12px 14px;
+      background: #e7eaf1;
       color: #111;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 17px;
+      font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
     }
 
     button.active {
-      background: #111;
-      color: #fff;
+      background: #111827;
+      color: white;
     }
 
-    .nav-row {
-      display: flex;
-      gap: 8px;
+    .summary-box {
+      background: white;
+      border-radius: 16px;
+      padding: 14px 16px;
       margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    .nav-btn {
-      flex: 1;
+    .summary-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .summary-sub {
+      font-size: 16px;
+      color: #666;
     }
 
     .cards {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 14px;
     }
 
     .card {
-      background: #fff;
-      border-radius: 16px;
+      background: white;
+      border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
     }
 
     .card h2 {
-      margin: 0 0 10px 0;
+      margin: 0 0 12px;
       font-size: 24px;
     }
 
     .menu {
       white-space: pre-line;
-      font-size: 20px;
+      font-size: 21px;
       line-height: 1.7;
+      word-break: keep-all;
     }
 
     .empty {
@@ -93,56 +129,78 @@
       margin-top: 14px;
       font-size: 17px;
       color: #444;
+      font-weight: 700;
     }
 
     .footer-note {
-      margin-top: 18px;
-      font-size: 14px;
+      margin-top: 16px;
+      font-size: 15px;
       color: #666;
+      text-align: center;
+    }
+
+    @media (min-width: 760px) {
+      .cards {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .card h2 {
+        font-size: 22px;
+      }
+
+      .menu {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>UNIST 식단</h1>
-  <div class="sub" id="currentLabel">불러오는 중...</div>
+  <div class="wrap">
+    <h1>UNIST 식단</h1>
+    <div class="subtitle">교직원식당 · 학생식당 · 기숙사식당</div>
 
-  <div class="tab-row" id="dayTabs"></div>
-
-  <div class="nav-row">
-    <button class="nav-btn" onclick="moveDay(-1)">← 이전 요일</button>
-    <button class="nav-btn" onclick="moveDay(1)">다음 요일 →</button>
-  </div>
-
-  <div class="tab-row" id="mealTabs"></div>
-
-  <div class="cards">
-    <div class="card">
-      <h2>교직원 식당</h2>
-      <div class="menu" id="facultyMenu">불러오는 중...</div>
-      <div class="calorie" id="facultyCalorie"></div>
+    <div class="top-actions">
+      <button onclick="moveDay(-1)">← 이전 요일</button>
+      <button onclick="goToday()">오늘</button>
+      <button onclick="moveDay(1)">다음 요일 →</button>
     </div>
 
-    <div class="card">
-      <h2>학생 식당</h2>
-      <div class="menu" id="studentMenu">불러오는 중...</div>
-      <div class="calorie" id="studentCalorie"></div>
+    <div class="tab-row" id="dayTabs"></div>
+    <div class="tab-row" id="mealTabs"></div>
+
+    <div class="summary-box">
+      <div class="summary-title" id="summaryTitle">불러오는 중...</div>
+      <div class="summary-sub" id="summarySub">잠시만 기다려 주세요.</div>
     </div>
 
-    <div class="card">
-      <h2>기숙사 식당</h2>
-      <div class="menu" id="dormMenu">불러오는 중...</div>
-      <div class="calorie" id="dormCalorie"></div>
-    </div>
-  </div>
+    <div class="cards">
+      <div class="card">
+        <h2>교직원 식당</h2>
+        <div class="menu" id="facultyMenu">불러오는 중...</div>
+        <div class="calorie" id="facultyCalorie"></div>
+      </div>
 
-  <div class="footer-note">
-    요일과 식사 시간을 눌러 바꿔볼 수 있습니다.
+      <div class="card">
+        <h2>학생 식당</h2>
+        <div class="menu" id="studentMenu">불러오는 중...</div>
+        <div class="calorie" id="studentCalorie"></div>
+      </div>
+
+      <div class="card">
+        <h2>기숙사 식당</h2>
+        <div class="menu" id="dormMenu">불러오는 중...</div>
+        <div class="calorie" id="dormCalorie"></div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      요일과 식사 버튼을 눌러 바꿔볼 수 있어요.
+    </div>
   </div>
 
   <script>
     const DAY_CODES = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
-
     const MEAL_TYPES = ["BREAKFAST", "LUNCH", "DINNER"];
     const MEAL_LABELS = {
       BREAKFAST: "아침",
@@ -150,27 +208,26 @@
       DINNER: "저녁"
     };
 
+    // 저장소 코드 기준상 교직원식당은 확인됨.
+    // 학생/기숙사 식당 이름은 데이터에 따라 조금 다를 수 있어서 alias를 넉넉하게 둠.
     const RESTAURANTS = [
       {
-        key: "faculty",
         title: "교직원 식당",
-        elementMenu: "facultyMenu",
-        elementCalorie: "facultyCalorie",
-        aliases: ["교직원 식당"]
+        menuId: "facultyMenu",
+        calorieId: "facultyCalorie",
+        aliases: ["교직원 식당", "교직원식당", "faculty"]
       },
       {
-        key: "student",
         title: "학생 식당",
-        elementMenu: "studentMenu",
-        elementCalorie: "studentCalorie",
-        aliases: ["학생 식당"]
+        menuId: "studentMenu",
+        calorieId: "studentCalorie",
+        aliases: ["학생 식당", "학생식당", "학생", "student"]
       },
       {
-        key: "dorm",
         title: "기숙사 식당",
-        elementMenu: "dormMenu",
-        elementCalorie: "dormCalorie",
-        aliases: ["기숙사 식당"]
+        menuId: "dormMenu",
+        calorieId: "dormCalorie",
+        aliases: ["기숙사 식당", "기숙사식당", "기숙사", "dormitory", "dorm"]
       }
     ];
 
@@ -182,7 +239,25 @@
       const hour = new Date().getHours();
       if (hour < 8) return "BREAKFAST";
       if (hour < 13) return "LUNCH";
+      if (hour < 18) return "DINNER";
       return "DINNER";
+    }
+
+    function getCurrentWeekDate(dayIndex) {
+      const now = new Date();
+      const todayIndex = now.getDay();
+      const diff = dayIndex - todayIndex;
+      const target = new Date(now);
+      target.setDate(now.getDate() + diff);
+      return target;
+    }
+
+    function formatDate(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = dateObj.getMonth() + 1;
+      const d = dateObj.getDate();
+      const day = DAY_LABELS[dateObj.getDay()];
+      return `${y}년 ${m}월 ${d}일 (${day})`;
     }
 
     function renderDayTabs() {
@@ -191,7 +266,7 @@
 
       DAY_LABELS.forEach((label, index) => {
         const btn = document.createElement("button");
-        btn.textContent = label;
+        btn.textContent = `${label}`;
         if (index === selectedDayIndex) btn.classList.add("active");
         btn.onclick = () => {
           selectedDayIndex = index;
@@ -222,25 +297,44 @@
       renderAll();
     }
 
-    function setHeaderLabel() {
-      document.getElementById("currentLabel").textContent =
-        `${DAY_LABELS[selectedDayIndex]}요일 · ${MEAL_LABELS[selectedMealType]}`;
+    function goToday() {
+      selectedDayIndex = new Date().getDay();
+      selectedMealType = getDefaultMealType();
+      renderAll();
+    }
+
+    function updateSummary() {
+      const dateObj = getCurrentWeekDate(selectedDayIndex);
+      const title = `${formatDate(dateObj)} · ${MEAL_LABELS[selectedMealType]}`;
+      let sub = "";
+
+      const today = new Date();
+      const isToday = today.getDay() === selectedDayIndex;
+      if (isToday) {
+        sub = `오늘 기준 ${MEAL_LABELS[selectedMealType]} 메뉴`;
+      } else {
+        sub = `${DAY_LABELS[selectedDayIndex]}요일 ${MEAL_LABELS[selectedMealType]} 메뉴`;
+      }
+
+      document.getElementById("summaryTitle").textContent = title;
+      document.getElementById("summarySub").textContent = sub;
+    }
+
+    function normalizeText(text) {
+      return String(text || "").replace(/\s+/g, "").toLowerCase();
     }
 
     function findMeal(dayCode, mealType, aliases) {
-      return allData.find(item =>
-        item.dayType === dayCode &&
-        item.mealType === mealType &&
-        aliases.includes(item.restaurantType)
-      );
+      return allData.find(item => {
+        const restaurantType = normalizeText(item.restaurantType);
+        const aliasMatch = aliases.some(alias => normalizeText(alias) === restaurantType);
+        return item.dayType === dayCode && item.mealType === mealType && aliasMatch;
+      });
     }
 
-    function fillRestaurantCard(restaurant) {
-      const dayCode = DAY_CODES[selectedDayIndex];
-      const result = findMeal(dayCode, selectedMealType, restaurant.aliases);
-
-      const menuEl = document.getElementById(restaurant.elementMenu);
-      const calorieEl = document.getElementById(restaurant.elementCalorie);
+    function setCard(menuId, calorieId, result) {
+      const menuEl = document.getElementById(menuId);
+      const calorieEl = document.getElementById(calorieId);
 
       if (!result) {
         menuEl.textContent = "해당 메뉴가 없습니다.";
@@ -249,17 +343,34 @@
         return;
       }
 
-      menuEl.textContent = result.menus.join("\n");
+      const menus = Array.isArray(result.menus) ? result.menus : [];
+      menuEl.textContent = menus.length ? menus.join("\n") : "메뉴 정보가 없습니다.";
       menuEl.classList.remove("empty");
-      calorieEl.textContent = result.calorie ? `🔥 ${result.calorie} kcal` : "";
+
+      if (result.calorie) {
+        calorieEl.textContent = `🔥 ${result.calorie}`;
+      } else {
+        calorieEl.textContent = "";
+      }
+    }
+
+    function renderCards() {
+      const dayCode = DAY_CODES[selectedDayIndex];
+
+      const faculty = findMeal(dayCode, selectedMealType, RESTAURANTS[0].aliases);
+      const student = findMeal(dayCode, selectedMealType, RESTAURANTS[1].aliases);
+      const dorm = findMeal(dayCode, selectedMealType, RESTAURANTS[2].aliases);
+
+      setCard("facultyMenu", "facultyCalorie", faculty);
+      setCard("studentMenu", "studentCalorie", student);
+      setCard("dormMenu", "dormCalorie", dorm);
     }
 
     function renderAll() {
       renderDayTabs();
       renderMealTabs();
-      setHeaderLabel();
-
-      RESTAURANTS.forEach(fillRestaurantCard);
+      updateSummary();
+      renderCards();
     }
 
     async function init() {
@@ -268,7 +379,8 @@
         allData = await res.json();
         renderAll();
       } catch (e) {
-        document.getElementById("currentLabel").textContent = "데이터를 불러오지 못했습니다.";
+        document.getElementById("summaryTitle").textContent = "데이터를 불러오지 못했습니다.";
+        document.getElementById("summarySub").textContent = "잠시 후 다시 시도해 주세요.";
         document.getElementById("facultyMenu").textContent = "불러오기 실패";
         document.getElementById("studentMenu").textContent = "불러오기 실패";
         document.getElementById("dormMenu").textContent = "불러오기 실패";

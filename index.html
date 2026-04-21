@@ -5,198 +5,218 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UNIST 식단</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 16px;
+      padding: 14px;
       font-family: Arial, sans-serif;
-      background: #f6f7fb;
+      background: #f5f6f8;
       color: #111;
     }
 
     .wrap {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
-    .subtitle {
-      font-size: 17px;
-      color: #555;
-      margin-bottom: 14px;
+    .title {
+      font-size: 22px;
+      font-weight: 800;
     }
 
-    .top-actions {
+    .meal-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .top-actions button {
-      flex: 1;
     }
 
     .tab-row {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      padding-bottom: 2px;
     }
 
     .tab-row::-webkit-scrollbar {
-      height: 6px;
+      height: 5px;
     }
 
     .tab-row::-webkit-scrollbar-thumb {
-      background: #d0d4dd;
+      background: #d8dce2;
       border-radius: 999px;
     }
 
     button {
       border: none;
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: #e7eaf1;
-      color: #111;
-      font-size: 17px;
+      border-radius: 14px;
+      background: #e9ebef;
+      color: #666;
+      font-size: 15px;
       font-weight: 700;
+      padding: 12px 16px;
       white-space: nowrap;
-      cursor: pointer;
     }
 
     button.active {
-      background: #111827;
+      background: #10c97f;
       color: white;
     }
 
-    .summary-box {
-      background: white;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .summary-title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .summary-sub {
-      font-size: 16px;
+    .summary {
+      font-size: 14px;
       color: #666;
+      margin-bottom: 12px;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
     .card {
-      background: white;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      background: #f0f7f4;
+      border-radius: 22px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      min-height: 220px;
     }
 
-    .card h2 {
-      margin: 0 0 12px;
-      font-size: 24px;
+    .card.copied {
+      outline: 3px solid rgba(16, 201, 127, 0.28);
+    }
+
+    .card-head {
+      background: #e4f2ed;
+      color: #238f67;
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+      padding: 14px 8px;
+    }
+
+    .card-body {
+      background: #fff;
+      padding: 14px 14px 10px 14px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
     }
 
     .menu {
       white-space: pre-line;
-      font-size: 21px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.65;
       word-break: keep-all;
+      flex: 1;
     }
 
     .empty {
-      color: #888;
+      color: #999;
     }
 
-    .calorie {
-      margin-top: 14px;
-      font-size: 17px;
-      color: #444;
+    .kcal {
+      text-align: right;
+      font-size: 14px;
       font-weight: 700;
+      color: #333;
+      margin-top: 10px;
     }
 
-    .footer-note {
-      margin-top: 16px;
-      font-size: 15px;
-      color: #666;
+    .footer {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #777;
       text-align: center;
     }
 
-    @media (min-width: 760px) {
-      .cards {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: rgba(17, 24, 39, 0.95);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      z-index: 9999;
+    }
 
-      .card h2 {
-        font-size: 22px;
+    .toast.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 420px) {
+      .card-head {
+        font-size: 14px;
       }
 
       .menu {
-        font-size: 18px;
+        font-size: 14px;
+      }
+
+      .kcal {
+        font-size: 13px;
       }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>UNIST 식단</h1>
-    <div class="subtitle">교직원식당 · 학생식당 · 기숙사식당</div>
-
-    <div class="top-actions">
-      <button onclick="moveDay(-1)">← 이전 요일</button>
-      <button onclick="goToday()">오늘</button>
-      <button onclick="moveDay(1)">다음 요일 →</button>
+    <div class="topbar">
+      <div class="title" id="pageTitle">4월 21일</div>
+      <div class="meal-tabs" id="mealTabs"></div>
     </div>
 
     <div class="tab-row" id="dayTabs"></div>
-    <div class="tab-row" id="mealTabs"></div>
 
-    <div class="summary-box">
-      <div class="summary-title" id="summaryTitle">불러오는 중...</div>
-      <div class="summary-sub" id="summarySub">잠시만 기다려 주세요.</div>
-    </div>
+    <div class="summary" id="summaryText">불러오는 중...</div>
 
     <div class="cards">
-      <div class="card">
-        <h2>교직원 식당</h2>
-        <div class="menu" id="facultyMenu">불러오는 중...</div>
-        <div class="calorie" id="facultyCalorie"></div>
+      <div class="card" id="dormCard" onclick="copyMenu('기숙사 식당 한식', 'dormMenu', 'dormKcal', 'dormCard')">
+        <div class="card-head">기숙사 식당 한식</div>
+        <div class="card-body">
+          <div class="menu" id="dormMenu">불러오는 중...</div>
+          <div class="kcal" id="dormKcal"></div>
+        </div>
       </div>
 
-      <div class="card">
-        <h2>학생 식당</h2>
-        <div class="menu" id="studentMenu">불러오는 중...</div>
-        <div class="calorie" id="studentCalorie"></div>
+      <div class="card" id="studentCard" onclick="copyMenu('학생 식당 한식', 'studentMenu', 'studentKcal', 'studentCard')">
+        <div class="card-head">학생 식당 한식</div>
+        <div class="card-body">
+          <div class="menu" id="studentMenu">불러오는 중...</div>
+          <div class="kcal" id="studentKcal"></div>
+        </div>
       </div>
 
-      <div class="card">
-        <h2>기숙사 식당</h2>
-        <div class="menu" id="dormMenu">불러오는 중...</div>
-        <div class="calorie" id="dormCalorie"></div>
+      <div class="card" id="facultyCard" onclick="copyMenu('교직원 식당 한식', 'facultyMenu', 'facultyKcal', 'facultyCard')">
+        <div class="card-head">교직원 식당 한식</div>
+        <div class="card-body">
+          <div class="menu" id="facultyMenu">불러오는 중...</div>
+          <div class="kcal" id="facultyKcal"></div>
+        </div>
       </div>
     </div>
 
-    <div class="footer-note">
-      요일과 식사 버튼을 눌러 바꿔볼 수 있어요.
-    </div>
+    <div class="footer">카드를 한 번 누르면 복사됩니다.</div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
     const DAY_CODES = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -208,26 +228,25 @@
       DINNER: "저녁"
     };
 
-    // 저장소 코드 기준상 교직원식당은 확인됨.
-    // 학생/기숙사 식당 이름은 데이터에 따라 조금 다를 수 있어서 alias를 넉넉하게 둠.
+    // 할랄은 제외. 한식 계열만 노출.
     const RESTAURANTS = [
       {
-        title: "교직원 식당",
-        menuId: "facultyMenu",
-        calorieId: "facultyCalorie",
-        aliases: ["교직원 식당", "교직원식당", "faculty"]
-      },
-      {
-        title: "학생 식당",
-        menuId: "studentMenu",
-        calorieId: "studentCalorie",
-        aliases: ["학생 식당", "학생식당", "학생", "student"]
-      },
-      {
-        title: "기숙사 식당",
+        title: "기숙사 식당 한식",
         menuId: "dormMenu",
-        calorieId: "dormCalorie",
-        aliases: ["기숙사 식당", "기숙사식당", "기숙사", "dormitory", "dorm"]
+        kcalId: "dormKcal",
+        aliases: ["기숙사 식당 한식", "기숙사식당한식", "기숙사 식당", "기숙사식당"]
+      },
+      {
+        title: "학생 식당 한식",
+        menuId: "studentMenu",
+        kcalId: "studentKcal",
+        aliases: ["학생 식당 한식", "학생식당한식", "학생 식당", "학생식당"]
+      },
+      {
+        title: "교직원 식당 한식",
+        menuId: "facultyMenu",
+        kcalId: "facultyKcal",
+        aliases: ["교직원 식당 한식", "교직원식당한식", "교직원 식당", "교직원식당"]
       }
     ];
 
@@ -252,7 +271,11 @@
       return target;
     }
 
-    function formatDate(dateObj) {
+    function formatDateKorean(dateObj) {
+      return `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일`;
+    }
+
+    function formatFullDateKorean(dateObj) {
       const y = dateObj.getFullYear();
       const m = dateObj.getMonth() + 1;
       const d = dateObj.getDate();
@@ -260,27 +283,20 @@
       return `${y}년 ${m}월 ${d}일 (${day})`;
     }
 
-    function renderDayTabs() {
-      const container = document.getElementById("dayTabs");
-      container.innerHTML = "";
+    function normalizeText(text) {
+      return String(text || "").replace(/\s+/g, "").toLowerCase();
+    }
 
-      DAY_LABELS.forEach((label, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = `${label}`;
-        if (index === selectedDayIndex) btn.classList.add("active");
-        btn.onclick = () => {
-          selectedDayIndex = index;
-          renderAll();
-        };
-        container.appendChild(btn);
-      });
+    function isHalal(text) {
+      const t = normalizeText(text);
+      return t.includes("할랄") || t.includes("halal");
     }
 
     function renderMealTabs() {
       const container = document.getElementById("mealTabs");
       container.innerHTML = "";
 
-      MEAL_TYPES.forEach((mealType) => {
+      MEAL_TYPES.forEach(mealType => {
         const btn = document.createElement("button");
         btn.textContent = MEAL_LABELS[mealType];
         if (mealType === selectedMealType) btn.classList.add("active");
@@ -292,85 +308,135 @@
       });
     }
 
-    function moveDay(step) {
-      selectedDayIndex = (selectedDayIndex + step + 7) % 7;
-      renderAll();
-    }
+    function renderDayTabs() {
+      const container = document.getElementById("dayTabs");
+      container.innerHTML = "";
 
-    function goToday() {
-      selectedDayIndex = new Date().getDay();
-      selectedMealType = getDefaultMealType();
-      renderAll();
-    }
-
-    function updateSummary() {
-      const dateObj = getCurrentWeekDate(selectedDayIndex);
-      const title = `${formatDate(dateObj)} · ${MEAL_LABELS[selectedMealType]}`;
-      let sub = "";
-
-      const today = new Date();
-      const isToday = today.getDay() === selectedDayIndex;
-      if (isToday) {
-        sub = `오늘 기준 ${MEAL_LABELS[selectedMealType]} 메뉴`;
-      } else {
-        sub = `${DAY_LABELS[selectedDayIndex]}요일 ${MEAL_LABELS[selectedMealType]} 메뉴`;
-      }
-
-      document.getElementById("summaryTitle").textContent = title;
-      document.getElementById("summarySub").textContent = sub;
-    }
-
-    function normalizeText(text) {
-      return String(text || "").replace(/\s+/g, "").toLowerCase();
+      // 참고 이미지처럼 월~일까지 보이게
+      const order = [1,2,3,4,5,6,0];
+      order.forEach(dayIndex => {
+        const btn = document.createElement("button");
+        btn.textContent = DAY_LABELS[dayIndex];
+        if (dayIndex === selectedDayIndex) btn.classList.add("active");
+        btn.onclick = () => {
+          selectedDayIndex = dayIndex;
+          renderAll();
+        };
+        container.appendChild(btn);
+      });
     }
 
     function findMeal(dayCode, mealType, aliases) {
       return allData.find(item => {
         const restaurantType = normalizeText(item.restaurantType);
         const aliasMatch = aliases.some(alias => normalizeText(alias) === restaurantType);
-        return item.dayType === dayCode && item.mealType === mealType && aliasMatch;
+        return (
+          item.dayType === dayCode &&
+          item.mealType === mealType &&
+          aliasMatch &&
+          !isHalal(item.restaurantType)
+        );
       });
     }
 
-    function setCard(menuId, calorieId, result) {
+    function setCard(menuId, kcalId, result) {
       const menuEl = document.getElementById(menuId);
-      const calorieEl = document.getElementById(calorieId);
+      const kcalEl = document.getElementById(kcalId);
 
       if (!result) {
         menuEl.textContent = "해당 메뉴가 없습니다.";
         menuEl.classList.add("empty");
-        calorieEl.textContent = "";
+        kcalEl.textContent = "";
         return;
       }
 
       const menus = Array.isArray(result.menus) ? result.menus : [];
       menuEl.textContent = menus.length ? menus.join("\n") : "메뉴 정보가 없습니다.";
       menuEl.classList.remove("empty");
+      kcalEl.textContent = result.calorie ? `${result.calorie} kcal` : "";
+    }
 
-      if (result.calorie) {
-        calorieEl.textContent = `🔥 ${result.calorie}`;
-      } else {
-        calorieEl.textContent = "";
-      }
+    function updateHeader() {
+      const dateObj = getCurrentWeekDate(selectedDayIndex);
+      document.getElementById("pageTitle").textContent = formatDateKorean(dateObj);
+      document.getElementById("summaryText").textContent =
+        `${formatFullDateKorean(dateObj)} · ${MEAL_LABELS[selectedMealType]}`;
     }
 
     function renderCards() {
       const dayCode = DAY_CODES[selectedDayIndex];
 
-      const faculty = findMeal(dayCode, selectedMealType, RESTAURANTS[0].aliases);
+      const dorm = findMeal(dayCode, selectedMealType, RESTAURANTS[0].aliases);
       const student = findMeal(dayCode, selectedMealType, RESTAURANTS[1].aliases);
-      const dorm = findMeal(dayCode, selectedMealType, RESTAURANTS[2].aliases);
+      const faculty = findMeal(dayCode, selectedMealType, RESTAURANTS[2].aliases);
 
-      setCard("facultyMenu", "facultyCalorie", faculty);
-      setCard("studentMenu", "studentCalorie", student);
-      setCard("dormMenu", "dormCalorie", dorm);
+      setCard("dormMenu", "dormKcal", dorm);
+      setCard("studentMenu", "studentKcal", student);
+      setCard("facultyMenu", "facultyKcal", faculty);
     }
 
     function renderAll() {
-      renderDayTabs();
       renderMealTabs();
-      updateSummary();
+      renderDayTabs();
+      updateHeader();
       renderCards();
+    }
+
+    function getCopyText(title, menuId, kcalId) {
+      const menuText = document.getElementById(menuId).textContent.trim();
+      const kcalText = document.getElementById(kcalId).textContent.trim();
+
+      if (!menuText || menuText === "해당 메뉴가 없습니다." || menuText === "불러오는 중..." || menuText === "메뉴 정보가 없습니다.") {
+        return null;
+      }
+
+      const dateObj = getCurrentWeekDate(selectedDayIndex);
+      const dateText = formatFullDateKorean(dateObj);
+      const mealLabel = MEAL_LABELS[selectedMealType];
+
+      const lines = menuText
+        .split("\n")
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(s => `- ${s}`)
+        .join("\n");
+
+      return `[${title} ${mealLabel} / ${dateText}]
+${lines}
+
+${kcalText || "칼로리 정보 없음"}`;
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1200);
+    }
+
+    function markCopied(cardId) {
+      const card = document.getElementById(cardId);
+      card.classList.add("copied");
+      setTimeout(() => card.classList.remove("copied"), 800);
+    }
+
+    async function copyMenu(title, menuId, kcalId, cardId) {
+      const text = getCopyText(title, menuId, kcalId);
+      if (!text) {
+        showToast("복사할 메뉴가 없어요.");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        markCopied(cardId);
+        showToast("복사 완료");
+      } catch (e) {
+        prompt("복사해서 사용하세요:", text);
+      }
     }
 
     async function init() {
@@ -379,11 +445,10 @@
         allData = await res.json();
         renderAll();
       } catch (e) {
-        document.getElementById("summaryTitle").textContent = "데이터를 불러오지 못했습니다.";
-        document.getElementById("summarySub").textContent = "잠시 후 다시 시도해 주세요.";
-        document.getElementById("facultyMenu").textContent = "불러오기 실패";
-        document.getElementById("studentMenu").textContent = "불러오기 실패";
+        document.getElementById("summaryText").textContent = "데이터를 불러오지 못했습니다.";
         document.getElementById("dormMenu").textContent = "불러오기 실패";
+        document.getElementById("studentMenu").textContent = "불러오기 실패";
+        document.getElementById("facultyMenu").textContent = "불러오기 실패";
       }
     }
 

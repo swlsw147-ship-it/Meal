@@ -1,39 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="utf-8">
-<title>교직원 식당 메뉴</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>교직원 식당 메뉴</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 20px;
+      line-height: 1.6;
+      background: #ffffff;
+      color: #111;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .date {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #f5f5f5;
+    }
+    button.active {
+      background: #111;
+      color: white;
+    }
+    .section-title {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 16px 0 12px;
+    }
+    .menu-box {
+      white-space: pre-line;
+      font-size: 22px;
+    }
+    .calorie {
+      margin-top: 16px;
+      font-size: 20px;
+    }
+    .note {
+      margin-top: 16px;
+      font-size: 16px;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-<h2>🍽 오늘 교직원 식당 점심</h2>
-<pre id="menu">불러오는 중...</pre>
+  <h1>교직원 식당 메뉴</h1>
+  <div class="date" id="date"></div>
 
-<script>
-async function loadMenu() {
-  const res = await fetch("https://meal.hexa.pro/mainpage/data");
-  const data = await res.json();
+  <div class="buttons">
+    <button id="btn-breakfast" onclick="loadMenu('BREAKFAST')">아침</button>
+    <button id="btn-lunch" onclick="loadMenu('LUNCH')">점심</button>
+    <button id="btn-dinner" onclick="loadMenu('DINNER')">저녁</button>
+  </div>
 
-  const dayMap = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const today = dayMap[new Date().getDay()];
+  <div class="section-title" id="mealTitle">불러오는 중...</div>
+  <div class="menu-box" id="menu">잠시만 기다려 주세요.</div>
+  <div class="calorie" id="calorie"></div>
+  <div class="note">현재 시간 기준으로 다음 식사를 자동 선택합니다.</div>
 
-  const result = data.find(item =>
-    item.dayType === today &&
-    item.mealType === "LUNCH" &&
-    item.restaurantType === "교직원 식당"
-  );
+  <script>
+    const dayMap = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+    const mealNameMap = {
+      BREAKFAST: "아침",
+      LUNCH: "점심",
+      DINNER: "저녁"
+    };
 
-  const el = document.getElementById("menu");
+    let allData = [];
+    let todayCode = "";
 
-  if (!result) {
-    el.textContent = "메뉴 없음";
-    return;
-  }
+    function getTodayText() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth() + 1;
+      const d = now.getDate();
+      const dayNames = ["일","월","화","수","목","금","토"];
+      const day = dayNames[now.getDay()];
+      return `${y}년 ${m}월 ${d}일 (${day})`;
+    }
 
-  el.textContent = result.menus.join("\n") + 
-    "\n\n🔥 " + (result.calorie || "");
-}
+    function getNextMealType() {
+      const now = new Date();
+      const hour = now.getHours();
 
-loadMenu();
-</script>
+      if (hour < 8) return "BREAKFAST";
+      if (hour < 13) return "LUNCH";
+      if (hour < 18) return "DINNER";
+      return "DINNER";
+    }
+
+    function setActiveButton(mealType) {
+      document.getElementById("btn-breakfast").classList.remove("active");
+      document.getElementById("btn-lunch").classList.remove("active");
+      document.getElementById("btn-dinner").classList.remove("active");
+
+      if (mealType === "BREAKFAST") document.getElementById("btn-breakfast").classList.add("active");
+      if (mealType === "LUNCH") document.getElementById("btn-lunch").classList.add("active");
+      if (mealType === "DINNER") document.getElementById("btn-dinner").classList.add("active");
+    }
+
+    async function init() {
+      document.getElementById("date").textContent = getTodayText();
+
+      const res = await fetch("https://meal.hexa.pro/mainpage/data");
+      allData = await res.json();
+
+      todayCode = dayMap[new Date().getDay()];
+      const defaultMeal = getNextMealType();
+      loadMenu(defaultMeal);
+    }
+
+    function loadMenu(mealType) {
+      setActiveButton(mealType);
+
+      const result = allData.find(item =>
+        item.dayType === todayCode &&
+        item.mealType === mealType &&
+        item.restaurantType === "교직원 식당"
+      );
+
+      document.getElementById("mealTitle").textContent =
+        `오늘 교직원 식당 ${mealNameMap[mealType]}`;
+
+      if (!result) {
+        document.getElementById("menu").textContent = "해당 식사 메뉴가 없습니다.";
+        document.getElementById("calorie").textContent = "";
+        return;
+      }
+
+      document.getElementById("menu").textContent = result.menus.join("\n");
+      document.getElementById("calorie").textContent =
+        `🔥 ${result.calorie || "칼로리 정보 없음"}`;
+    }
+
+    init();
+  </script>
 </body>
 </html>
